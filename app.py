@@ -7,23 +7,22 @@ import threading
 import os
 import sys
 
-# Add path for importing the audio service
+# adding the path for importing  the audio service
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from service.audio import play_beep   # <-- make sure this file exists
+from service.audio import play_beep 
 
-# Load YOLO model
+# Loading model
 model = YOLO("model/best.pt")
 
 st.title("Helmet Detection App")
 
-# Create outputs folder
+# creating output folder
 os.makedirs("outputs", exist_ok=True)
 
-# User chooses input
 input_type = st.radio("Select Input Type:", ("Image", "Video", "Webcam"))
 CONF_THRESHOLD = st.slider("Confidence Threshold", 0.0, 1.0, 0.25, 0.05)
 
-# ---------------------- IMAGE ----------------------
+# For image
 if input_type == "Image":
     uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
@@ -32,7 +31,6 @@ if input_type == "Image":
         results = model.predict(source=frame, conf=CONF_THRESHOLD, verbose=False)
         annotated_frame = results[0].plot()
 
-        # Beep when helmet detected (assuming class ID 1 = helmet)
         detected_classes = [int(cls) for cls in results[0].boxes.cls]
         if 1 in detected_classes:
             play_beep()
@@ -40,7 +38,7 @@ if input_type == "Image":
         annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
         st.image(annotated_frame, caption="Detection Result", use_column_width=True)
 
-# ---------------------- VIDEO ----------------------
+# For video
 elif input_type == "Video":
     uploaded_file = st.file_uploader("Upload a video", type=["mp4", "avi"])
     if uploaded_file is not None:
@@ -50,7 +48,7 @@ elif input_type == "Video":
         st.video(tfile)
         st.info("Video detection works best in local OpenCV GUI, not Streamlit.")
 
-# ---------------------- WEBCAM ----------------------
+# For webcam
 elif input_type == "Webcam":
     st.warning("Real-time webcam detection will open in a separate OpenCV window.")
     
@@ -69,7 +67,6 @@ elif input_type == "Webcam":
                 results = model.predict(source=frame, conf=CONF_THRESHOLD, verbose=False)
                 annotated = results[0].plot()
 
-                # Check for helmet class (change ID if needed)
                 detected_classes = [int(cls) for cls in results[0].boxes.cls]
                 if 1 in detected_classes:
                     play_beep()
@@ -84,3 +81,4 @@ elif input_type == "Webcam":
 
         threading.Thread(target=run_webcam).start()
         st.info("Press 'q' in the OpenCV window to stop the webcam.")
+
