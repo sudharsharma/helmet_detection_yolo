@@ -2,28 +2,25 @@ import sys
 import cv2
 import os
 from ultralytics import YOLO
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from service.audio import play_beep
-from datetime import datetime
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Make sure outputs folder exists
 os.makedirs("outputs", exist_ok=True)
 
-# Load YOLO model
+# Loading model
 model = YOLO("model/best.pt")
 
-# Detect helmets in a frame
+# Detecting the helmet on the frame
 def detect_helmet(frame, conf_threshold=0.25, beep_on_helmet=True):
     frame_resized = cv2.resize(frame, (640, 640))
     results = model.predict(source=frame_resized, conf=conf_threshold, verbose=False)
     annotated_frame = results[0].plot()
     detected_classes = [int(cls) for cls in results[0].boxes.cls]
-    print("Detected classes:", detected_classes)  # DEBUG: prints detected IDs
+    print("Detected classes:", detected_classes) 
     if beep_on_helmet and 1 in detected_classes:
         play_beep()
     return annotated_frame
 
-# Process input: webcam, video, or image
 def process_input(source=None, is_webcam=False):
     if is_webcam:
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -32,7 +29,7 @@ def process_input(source=None, is_webcam=False):
             return
         out = None
 
-    elif source.endswith((".mp4", ".avi")):  # Video file
+    elif source.endswith((".mp4", ".avi")):  # for Video file
         cap = cv2.VideoCapture(source)
         if not cap.isOpened():
             print(f"[ERROR] Could not open video: {source}")
@@ -40,7 +37,7 @@ def process_input(source=None, is_webcam=False):
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         out = cv2.VideoWriter("outputs/output_video.mp4", fourcc, 20, (640, 640))
 
-    else:  # Single image
+    else:  
         cap = None
         img = cv2.imread(source)
         if img is None:
@@ -54,7 +51,7 @@ def process_input(source=None, is_webcam=False):
         print("[INFO] Saved result to outputs/result.jpg")
         return
 
-    # Video or webcam loop
+    # for video or webcame
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -70,9 +67,6 @@ def process_input(source=None, is_webcam=False):
     cv2.destroyAllWindows()
     if out: print("[INFO] Video saved to outputs/output_video.mp4")
 
-# ---------------------
-# Main
-# ---------------------
 if __name__ == "__main__":
     print("Select input type:")
     print("1 - Single image")
@@ -89,3 +83,4 @@ if __name__ == "__main__":
         process_input(is_webcam=True)
     else:
         print("Invalid choice")
+
