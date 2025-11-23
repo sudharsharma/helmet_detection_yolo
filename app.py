@@ -9,7 +9,7 @@ import sys
 
 # adding the path for importing  the audio service
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from service.audio import play_beep 
+from audio import play_beep 
 
 # Loading model
 model = YOLO("model/best.pt")
@@ -81,4 +81,5 @@ elif input_type == "Webcam":
 
         threading.Thread(target=run_webcam).start()
         st.info("Press 'q' in the OpenCV window to stop the webcam.")
+
 
