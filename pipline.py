@@ -2,7 +2,7 @@ import sys
 import cv2
 import os
 from ultralytics import YOLO
-from service.audio import play_beep
+from audio import play_beep
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 os.makedirs("outputs", exist_ok=True)
@@ -83,4 +83,5 @@ if __name__ == "__main__":
         process_input(is_webcam=True)
     else:
         print("Invalid choice")
+
 
